@@ -68,27 +68,28 @@ def expand_dataset(root=r'.\train_adjusted', min_size=200):
                 img = Trans.rand_trans(img)
                 try:
                     img.save(os.path.join(
-                    dir_class, expanded_graph[0:-4] + '_' + str(i) + '.jpg')
+                        dir_class, expanded_graph[0:-4] + '_' + str(i) + '.jpg')
                     )
                 except:
-                    pass
+                    print('save error')
 
 
 class Trans:
+    # 随机变换类型
     FLIP = [
         Image.FLIP_LEFT_RIGHT,
         Image.FLIP_TOP_BOTTOM,
+
+    ]
+    ROTATE = [
         Image.ROTATE_90,
         Image.ROTATE_180,
         Image.ROTATE_270
     ]
     FILTER = [
         ImageFilter.DETAIL,
-        ImageFilter.CONTOUR,
         ImageFilter.EDGE_ENHANCE,
         ImageFilter.EDGE_ENHANCE_MORE,
-        ImageFilter.EMBOSS,
-        ImageFilter.FIND_EDGES,
         ImageFilter.SMOOTH_MORE,
         ImageFilter.SHARPEN,
         ImageFilter.MinFilter,
@@ -101,10 +102,16 @@ class Trans:
     # 下面的几个静态方法全部为给图像施加随机效果的变换
     @staticmethod
     def flip(img):
-        times = rd.randint(1, 5)
+        times = rd.randint(1, 2)
         Flip = rd.sample(Trans.FLIP, times)
         for flip_type in Flip:
             img = img.transpose(flip_type)
+        return img
+
+    @staticmethod
+    def rotate(img):
+        rotate = rd.choice(Trans.ROTATE)
+        img = img.transpose(rotate)
         return img
 
     @staticmethod
@@ -112,7 +119,7 @@ class Trans:
         try:
             img = img.filter(ImageFilter.GaussianBlur())
         except:
-            pass
+            print('mode:', img.mode, 'trans: blur')
         return img
 
     @staticmethod
@@ -122,7 +129,7 @@ class Trans:
         try:
             img = enh.enhance(radius)
         except:
-            pass
+            print('mode:', img.mode, 'trans: enhance')
         return img
 
     @staticmethod
@@ -132,7 +139,7 @@ class Trans:
         try:
             img = enh.enhance(radius)
         except:
-            pass
+            print('mode:', img.mode, 'trans: brighten')
         return img
 
     @staticmethod
@@ -143,10 +150,11 @@ class Trans:
             try:
                 img = img.filter(filt)
             except:
-                pass
+                print('mode:', img.mode, 'trans: filter')
         return img
 
-    TRANS = [enhance.__func__, flip.__func__, blur.__func__, brighten.__func__, rand_filter.__func__]
+    TRANS = [enhance.__func__, rotate.__func__, blur.__func__, flip.__func__,
+             brighten.__func__, rand_filter.__func__, rotate.__func__]
 
     @staticmethod
     def rand_trans(img):
