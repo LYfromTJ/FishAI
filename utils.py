@@ -2,6 +2,7 @@ import os
 import random as rd
 import shutil
 
+import matplotlib.pyplot as plt
 import tqdm
 from PIL import Image
 from PIL import ImageEnhance
@@ -53,6 +54,17 @@ def extract_validation(root=r'.\train_adjusted', radius=0.2, save_root=r'.\valid
                 os.path.join(root, class_name, graph_list[i]),
                 os.path.join(dir_class_val, graph_list[i])
             )
+
+
+def show_distribution(root=r'D:\fishAI\train_adjusted'):
+    dic = {}
+    for class_name in os.listdir(root):
+        length = len(os.listdir(os.path.join(root, class_name)))
+        dic[length] = dic.get(length, 0) + 1
+    x = [i for i in dic]
+    y = [i for i in dic.values()]
+    plt.bar(x, y)
+    plt.show()
 
 
 def expand_dataset(root=r'.\train_adjusted', min_size=200):
@@ -172,4 +184,4 @@ class Trans:
 
 
 if __name__ == "__main__":
-    expand_dataset()
+    show_distribution(r'D:\fishAI\train_adjusted')
